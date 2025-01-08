@@ -1,0 +1,57 @@
+name: CI - Docker Build and Push
+
+on:
+  push:
+    branches:
+      - main  # or any branch you'd like to trigger the build
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Log in to Docker Hub (Make sure to add these secrets in GitHub repo settings)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 4: Build and push Docker images for each service
+
+      # User service
+      - name: Build and push api_gateway image
+        run: |
+          docker build -t muhdnasif/backend-api_gateway:latest ./backend-api_gateway
+          docker push muhdnasif/backend-api_gateway:latest
+
+      - name: Build and push user_service image
+        run: |
+          docker build -t muhdnasif/backend-user_service:latest ./backend-user_service
+          docker push muhdnasif/backend-user_service:latest
+
+      # Product service
+      - name: Build and push product_service image
+        run: |
+          docker build -t muhdnasif/backend-product_service:latest ./backend-product_service
+          docker push muhdnasif/backend-product_service:latest
+
+      # Order service
+      - name: Build and push order_service image
+        run: |
+          docker build -t muhdnasif/backend-order_service:latest ./backend-order_service
+          docker push muhdnasif/backend-order_service:latest
+
+      # Notification service
+      - name: Build and push notification_service image
+        run: |
+          docker build -t muhdnasif/backend-notification_service:latest ./backend-notification_service
+          docker push muhdnasif/backend-notification_service:latest
