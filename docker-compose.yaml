@@ -1,0 +1,160 @@
+services:
+  # Postgres database container
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_ORDER}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecom_network
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    ports:
+      - "15675:15672"
+      - "5672:5672"
+    networks:
+      - ecom_network
+
+  # Order Service container
+  order_service:
+    build:
+      context: ./order_service
+    container_name: order_service
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_ORDER}
+      - DJANGO_DEBUG=${DEBUG}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_NAME=${DB_NAME_ORDER}
+      - DATABASE_USER=${DB_USER}
+      - DATABASE_PASSWORD=${DB_PASSWORD}
+      - DATABASE_PORT=${DB_PORT}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./order_service:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+      - rabbitmq
+      - user_service
+    networks:
+      - ecom_network
+
+  # User Service container
+  user_service:
+    build:
+      context: ./user_service
+    container_name: user_service
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_USER}
+      - DJANGO_DEBUG=${DEBUG}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_NAME=${DB_NAME_USER}
+      - DATABASE_USER=${DB_USER}
+      - DATABASE_PASSWORD=${DB_PASSWORD}
+      - DATABASE_PORT=${DB_PORT}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./user_service:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8001"
+    depends_on:
+      - db
+    networks:
+      - ecom_network
+
+  # Product Service container
+  product_service:
+    build:
+      context: ./product_service
+    container_name: product_service
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_PRODUCT}
+      - DJANGO_DEBUG=${DEBUG}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_NAME=${DB_NAME_PRODUCT}
+      - DATABASE_USER=${DB_USER}
+      - DATABASE_PASSWORD=${DB_PASSWORD}
+      - DATABASE_PORT=${DB_PORT}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./product_service:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8002"
+    depends_on:
+      - db
+    networks:
+      - ecom_network
+
+  # Notification Service container
+  notification_service:
+    build: ./notification_service
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_NOTIFICATION}
+      - DJANGO_DEBUG=${DEBUG}
+      - EMAIL_BACKEND=${EMAIL_BACKEND}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./notification_service:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8003 & 
+             python manage.py start_consumer"
+    depends_on:
+      - rabbitmq
+    restart: always 
+    networks:
+      - ecom_network
+
+  api_gateway:
+    build:
+      context: ./api_gateway
+    container_name: api_gateway
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_API}
+      - DJANGO_DEBUG=${DEBUG}
+      - ORDER_SERVICE_URL=${ORDER_SERVICE_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL}
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./api_gateway:/app
+    depends_on:
+      - db
+      - rabbitmq
+      - order_service
+      - user_service
+      - product_service
+      - notification_service
+    networks:
+      - ecom_network
+
+volumes:
+  postgres_data:
+
+networks:
+  ecom_network:
+    driver: bridge

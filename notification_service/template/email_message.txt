@@ -1,0 +1,7 @@
+Hello {{username|safe}},
+
+    Your order for "{{product|safe}} ({{description|safe}})" with price RS.{{price}} for a quantity of {{qty}} 
+have been placed successfully. The total amount will be RS.{{ttl}}. you will recieve your order soon.
+Happy purchase.
+
+Thank you for chosing us!

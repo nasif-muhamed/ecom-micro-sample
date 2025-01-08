@@ -1,0 +1,66 @@
+import requests
+from django.http import JsonResponse
+from django.http import HttpResponse
+from django.conf import settings
+from rest_framework.decorators import api_view
+import os
+
+# URLs of the other services
+ORDER_SERVICE_URL = os.getenv('ORDER_SERVICE_URL')  # 'http://localhost:8000/'
+USER_SERVICE_URL = os.getenv('USER_SERVICE_URL')  # 'http://localhost:8001/'
+PRODUCT_SERVICE_URL = os.getenv('PRODUCT_SERVICE_URL')  # 'http://localhost:8002/'
+
+# Proxy view to User Service
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def proxy_to_user_service(request):
+    url = USER_SERVICE_URL + request.path
+    print('url: ', url) 
+    response = requests.request(
+        method=request.method,
+        url=url,
+        headers=request.headers,
+        json=request.data,
+    )
+    
+    return HttpResponse(
+        response.content,
+        status=response.status_code,
+        content_type=response.headers['Content-Type']
+    )
+
+# Proxy view to Product Service
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def proxy_to_product_service(request):
+    url = PRODUCT_SERVICE_URL + request.path
+
+    response = requests.request(
+        method=request.method,
+        url=url,
+        headers=request.headers,
+        json=request.data,
+    )
+    
+    return HttpResponse(
+        response.content,
+        status=response.status_code,
+        content_type=response.headers['Content-Type']
+    )
+
+# Proxy view to Order Service
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def proxy_to_order_service(request):
+    url = ORDER_SERVICE_URL + request.path
+
+    response = requests.request(
+        method=request.method,
+        url=url,
+        headers=request.headers,
+        json=request.data,
+    )
+    
+    return HttpResponse(
+        response.content,
+        status=response.status_code,
+        content_type=response.headers['Content-Type']
+    )
+
