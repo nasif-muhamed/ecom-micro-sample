@@ -30,28 +30,28 @@ jobs:
       # User service
       - name: Build and push api_gateway image
         run: |
-          docker build -t muhdnasif/backend-api_gateway:latest ./backend-api_gateway
+          docker build -t muhdnasif/backend-api_gateway:latest ./api_gateway
           docker push muhdnasif/backend-api_gateway:latest
 
       - name: Build and push user_service image
         run: |
-          docker build -t muhdnasif/backend-user_service:latest ./backend-user_service
+          docker build -t muhdnasif/backend-user_service:latest ./user_service
           docker push muhdnasif/backend-user_service:latest
 
       # Product service
       - name: Build and push product_service image
         run: |
-          docker build -t muhdnasif/backend-product_service:latest ./backend-product_service
+          docker build -t muhdnasif/backend-product_service:latest ./product_service
           docker push muhdnasif/backend-product_service:latest
 
       # Order service
       - name: Build and push order_service image
         run: |
-          docker build -t muhdnasif/backend-order_service:latest ./backend-order_service
+          docker build -t muhdnasif/backend-order_service:latest ./order_service
           docker push muhdnasif/backend-order_service:latest
 
       # Notification service
       - name: Build and push notification_service image
         run: |
-          docker build -t muhdnasif/backend-notification_service:latest ./backend-notification_service
+          docker build -t muhdnasif/backend-notification_service:latest ./notification_service
           docker push muhdnasif/backend-notification_service:latest
