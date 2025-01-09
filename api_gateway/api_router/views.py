@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.http import HttpResponse
 from django.conf import settings
 from rest_framework.decorators import api_view
+from django.shortcuts import HttpResponse
 import os
 
 # URLs of the other services
@@ -64,3 +65,5 @@ def proxy_to_order_service(request):
         content_type=response.headers['Content-Type']
     )
 
+def hello_world(request):
+    return HttpResponse('Hello World')

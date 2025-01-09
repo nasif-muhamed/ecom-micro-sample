@@ -1,9 +1,13 @@
 name: CI - Docker Build and Push
 
 on:
-  push:
-    branches:
-      - main  # or any branch you'd like to trigger the build
+  # It'll run the jobs only in case of manual triggrer
+  workflow_dispatch:
+    
+  # It'll run the jobs in case of a new push
+  # push:
+  #   branches:
+  #     - main  
 
 jobs:
   build:
@@ -27,12 +31,13 @@ jobs:
 
       # Step 4: Build and push Docker images for each service
 
-      # User service
+      # Api-Gateway service
       - name: Build and push api_gateway image
         run: |
           docker build -t muhdnasif/backend-api_gateway:latest ./api_gateway
           docker push muhdnasif/backend-api_gateway:latest
 
+      # User service
       - name: Build and push user_service image
         run: |
           docker build -t muhdnasif/backend-user_service:latest ./user_service
@@ -55,3 +60,38 @@ jobs:
         run: |
           docker build -t muhdnasif/backend-notification_service:latest ./notification_service
           docker push muhdnasif/backend-notification_service:latest
+
+  # test:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+
+  #     - name: Start containers using Docker Compose
+  #       run: |
+  #         docker-compose -f docker-compose.yml up -d
+
+  #     - name: Run tests for all services
+  #       run: |
+  #         docker-compose exec user_service python manage.py test
+  #         docker-compose exec product_service python manage.py test
+  #         docker-compose exec order_service python manage.py test
+  #         docker-compose exec notification_service python manage.py test
+
+  #     - name: Clean up containers
+  #       run: |
+  #         docker-compose down
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+
+  #   steps:
+  #     - name: Deploy to a server
+  #       run: |
+  #         echo "Hello world"
