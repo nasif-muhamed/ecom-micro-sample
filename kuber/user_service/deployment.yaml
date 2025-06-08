@@ -1,0 +1,42 @@
+# user-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: muhdnasif/backend-user_service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8001
+        envFrom:
+          - secretRef:
+              name: user-service-secrets
+          - configMapRef:
+              name: user-service-config
+        command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8001"]
+      restartPolicy: Always
+
+---
+# user-service-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  ports:
+  - port: 8001
+    targetPort: 8001
+  selector:
+    app: user-service
+  type: ClusterIP

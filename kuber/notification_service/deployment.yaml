@@ -1,0 +1,42 @@
+# notification-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+      - name: notification-service
+        image: muhdnasif/backend-notification_service:latest
+        imagePullPolicy: Never
+        envFrom:
+          - secretRef:
+              name: notification-service-secrets
+          - configMapRef:
+              name: notification-service-config
+        ports:
+        - containerPort: 8003
+        command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8003 & python manage.py start_consumer"]
+      restartPolicy: Always
+
+---
+# notification-service-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  ports:
+  - port: 8003
+    targetPort: 8003
+  selector:
+    app: notification-service
+  type: ClusterIP

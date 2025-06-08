@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-gateway-secrets
+type: Opaque
+data:
+  DJANGO_SECRET_KEY: ZGphbmdvLWluc2VjdXJlLXpzbTl5MWEkNmgkZGFocmMpNjE0OHIzMXh0YmsybGlqNyE0YTFxb3YlOGxAOHNyXihl
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+data:
+  DJANGO_DEBUG: "True"
+  ORDER_SERVICE_URL: "http://order-service:8000"
+  USER_SERVICE_URL: "http://user-service:8001"
+  PRODUCT_SERVICE_URL: "http://product-service:8002"
+

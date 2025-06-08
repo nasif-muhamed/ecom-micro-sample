@@ -1,0 +1,43 @@
+# api-gateway-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - name: api-gateway
+        image: muhdnasif/backend-api_gateway:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8010
+        envFrom:
+          - secretRef:
+              name: api-gateway-secrets
+          - configMapRef:
+              name: api-gateway-config
+      restartPolicy: Always
+
+---
+# api-gateway-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+spec:
+  ports:
+  - port: 8010
+    targetPort: 8010
+    nodePort: 30000
+
+  selector:
+    app: api-gateway
+  type: NodePort

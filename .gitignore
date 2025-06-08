@@ -1,6 +1,6 @@
 .env
 
-kuber/
+# kuber/
 
 # Optionally, you can add a more general rule to ignore any .env file anywhere in the repo
 **/.env

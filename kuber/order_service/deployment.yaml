@@ -1,0 +1,42 @@
+# order-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: muhdnasif/backend-order_service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        envFrom:
+          - secretRef:
+              name: order-service-secrets
+          - configMapRef:
+              name: order-service-config
+        command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+      restartPolicy: Always
+
+---
+# order-service-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: order-service
+  type: ClusterIP

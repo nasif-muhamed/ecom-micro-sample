@@ -1,0 +1,42 @@
+# product-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+      - name: product-service
+        image: muhdnasif/backend-product_service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8002
+        envFrom:
+          - secretRef:
+              name: product-service-secrets
+          - configMapRef:
+              name: product-service-config
+        command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8002"]
+      restartPolicy: Always
+
+---
+# product-service-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  ports:
+  - port: 8002
+    targetPort: 8002
+  selector:
+    app: product-service
+  type: ClusterIP

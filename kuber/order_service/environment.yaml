@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: order-service-secrets
+type: Opaque
+data:
+  DJANGO_SECRET_KEY: ZGphbmdvLWluc2VjdXJlLWEtcS1rKWdjNSR4MGRiayNwZWQrd3Q0YmF5LSZvXy1fdjBvaiV0ZnYrZ2N6bXg9b21r
+  DATABASE_PASSWORD: TmFzaWZAc3Fs
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+data:
+  DJANGO_DEBUG: "True"
+  DATABASE_HOST: "db"
+  DATABASE_NAME: "order_service_db"
+  DATABASE_USER: "postgres"
+  DATABASE_PORT: "5432"
+  USER_SERVICE_URL: "http://user-service:8001"
+  PRODUCT_SERVICE_URL: "http://product-service:8002"
+

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-service-secrets
+type: Opaque
+data:
+  DJANGO_SECRET_KEY: ZGphbmdvLWluc2VjdXJlLTNoZG5ebm5tITI1ZWchYiVkaWV6JV5xJGYxXjVlJSsoMDhfej1eZ28kZHFqaSNrIyo1
+  DATABASE_PASSWORD: TmFzaWZAc3Fs
+  JWT_SECRET_KEY: bXlfand0X1NFQ1JFVF9LRVk=
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+data:
+  DJANGO_DEBUG: "True"
+  DATABASE_HOST: "db"
+  DATABASE_NAME: "user_service_db"
+  DATABASE_USER: "postgres"
+  DATABASE_PORT: "5432"
+
